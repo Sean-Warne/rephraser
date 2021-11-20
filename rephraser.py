@@ -1,4 +1,5 @@
 import random
+from functools import reduce
 from nltk.corpus import wordnet as wn
 
 def rephrase_string(in_str, retry_max = 10):
@@ -14,34 +15,26 @@ def rephrase_string(in_str, retry_max = 10):
         while True:
             retry_count += 1
             
-            synsets = wn.synsets(word)
-            if (len(synsets) > 1):
-                rand_int = random.randint(0, len(synsets) - 1)
-            elif (len(synsets) == 1):
-                rand_int = 0
-            else:
-                synonym_out.append(word)
-                break
+            # generate a list of all synonyms
+            synonyms = []
+            for synset in wn.synsets(word): 
+                synonyms.append(wn.synset(synset.name()).lemma_names())
+            
+            # flatten and remove duplicates
+            synonyms = list(set(reduce(list.__add__, synonyms)))
 
-            synonyms = wn.synset(synsets[rand_int].name()).lemma_names()
-            if (len(synonyms) > 1):
-                rand_int = random.randint(0, len(synonyms) - 1)
-            else:
-                rand_int = 0
-
-            synonym = synonyms[rand_int]
+            # get a random synonym for the word
+            synonym = synonyms[random.randint(0, len(synonyms) - 1)]
             if (retry_count == retry_max or word != synonym):
                 synonym_out.append(synonym)
                 break
 
-    return ' '.join(synonym_out).replace('_', ' ').title()
+    return ' '.join(synonym_out).replace('_', ' ')
 
 ''' TODO
-- try to determine word tense and type (verb, noun, adverb, etc.)
+- add options for title, username, paragraph/sentence, etc.
 - slang words
 - sub in words from foreign languages
-- definitions?
-- lorem ipsum
-- include word types other than synonyms
-- navigate up the synonym tree (get synonyms of a synonym); populate array with all options before choosing randomly (more time + mem)
+- add option for antonyms
+- navigate up the synonym tree (get synonyms of a synonym); e.g. sad doesn't show unhappy as a syn but unhappy does show sad.
 '''
