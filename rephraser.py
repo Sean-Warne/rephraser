@@ -1,37 +1,47 @@
 import random
 from nltk.corpus import wordnet as wn
 
-def rephrase_string(in_str):
+def rephrase_string(in_str, retry_max = 10):
     synonym_out = []
     str_list = in_str.split()
 
     for word in str_list:
-        synsets = wn.synsets(word)
-        if (len(synsets) > 1):
-            rand_synset = random.randint(0, len(synsets) - 1)
-        elif (len(synsets) == 1):
-            rand_synset = 0
-        else:
-            synonym_out.append(word)
+        if (len(word) <= 2):
+            continue
 
-        synonyms = wn.synset(synsets[rand_synset].name()).lemma_names()
-        if (len(synonyms) > 1):
-            rand_synonym = random.randint(0, len(synonyms) - 1)
-        else:
-            rand_synonym = 0
+        # do while... until retry count is met or word doesn't match the original
+        retry_count = 0
+        while True:
+            retry_count += 1
+            
+            synsets = wn.synsets(word)
+            if (len(synsets) > 1):
+                rand_int = random.randint(0, len(synsets) - 1)
+            elif (len(synsets) == 1):
+                rand_int = 0
+            else:
+                synonym_out.append(word)
+                break
 
-        synonym_out.append(synonyms[rand_synonym])
+            synonyms = wn.synset(synsets[rand_int].name()).lemma_names()
+            if (len(synonyms) > 1):
+                rand_int = random.randint(0, len(synonyms) - 1)
+            else:
+                rand_int = 0
 
-    return ' '.join(synonym_out)
+            synonym = synonyms[rand_int]
+            if (retry_count == retry_max or word != synonym):
+                synonym_out.append(synonym)
+                break
+
+    return ' '.join(synonym_out).replace('_', ' ').title()
 
 ''' TODO
-- if word is unchanged, try again until it changes or until it runs x number of times
-- setup parameter for number of iterations to run
 - try to determine word tense and type (verb, noun, adverb, etc.)
-- don't change short words like 'a' or 'an'
 - slang words
 - sub in words from foreign languages
 - definitions?
 - lorem ipsum
 - include word types other than synonyms
+- navigate up the synonym tree (get synonyms of a synonym); populate array with all options before choosing randomly (more time + mem)
 '''
