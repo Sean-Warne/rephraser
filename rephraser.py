@@ -2,7 +2,7 @@ import random
 from functools import reduce
 from nltk.corpus import wordnet as wn
 
-def rephrase_string(in_str, retry_max = 10):
+def rephrase_string(in_str, retry_max = 10, use_antonyms = False, out_style = 'default'):
     synonym_out = []
     str_list = in_str.split()
 
@@ -29,7 +29,13 @@ def rephrase_string(in_str, retry_max = 10):
                 synonym_out.append(synonym)
                 break
 
-    return ' '.join(synonym_out).replace('_', ' ')
+    match out_style:
+        case 'title':
+            rephrased = ' '.join(synonym_out).title().replace('_', ' ')
+        case 'username':
+            rephrased = ''.join(synonym_out).title().replace('_', '')
+        case _:
+            rephrased = ' '.join(synonym_out).replace('_', ' ')
 
 ''' TODO
 - add options for title, username, paragraph/sentence, etc.
