@@ -33,12 +33,13 @@ def rephrase_string(in_str, retry_max = 10, use_antonyms = False, out_style = 'd
         case 'title':
             rephrased = ' '.join(synonym_out).title().replace('_', ' ')
         case 'username':
-            rephrased = ''.join(synonym_out).title().replace('_', '')
+            rephrased = '-'.join(synonym_out).title().replace('_', '').replace('-', '').replace("'", '')
         case _:
             rephrased = ' '.join(synonym_out).replace('_', ' ')
 
+    return rephrased
+
 ''' TODO
-- add options for title, username, paragraph/sentence, etc.
 - slang words
 - sub in words from foreign languages
 - add option for antonyms
